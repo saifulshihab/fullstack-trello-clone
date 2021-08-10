@@ -1,18 +1,28 @@
 import React from 'react';
+import ReactModal from 'react-modal';
+import { Route, Switch } from 'react-router-dom';
 import './App.css';
-import { Switch, Route } from 'react-router-dom';
+import Navbar from './Components/Navbar';
+import Board from './Pages/Board';
 import HomePage from './Pages/HomePage';
 import PageNotFound from './Pages/PageNotFound';
-import Navbar from './Components/Navbar';
+
+ReactModal.setAppElement('#root');
 
 const App = () => {
   return (
-    <div className="w-screen">
+    <div className="w-full h-screen flex flex-col">
       <Navbar />
-      <Switch>
-        <Route path="/boards" component={HomePage} />
-        <Route component={PageNotFound} />
-      </Switch>
+      <div
+        className="w-full flex-1"
+        style={{ maxHeight: `calc(100% - 2.5rem)` }}
+      >
+        <Switch>
+          <Route path="/boards" component={HomePage} />
+          <Route path="/b/:boardId" component={Board} />
+          <Route component={PageNotFound} />
+        </Switch>
+      </div>
     </div>
   );
 };

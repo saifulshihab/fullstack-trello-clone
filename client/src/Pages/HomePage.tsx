@@ -12,13 +12,14 @@ import {
   MdKeyboardArrowUp,
   RiSettings5Line,
 } from 'react-icons/all';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   const [dropDown, setDropDown] = useState(false);
 
   return (
     <div className="w-full flex mt-5">
-      <div className="w-full sm:max-w-7xl mx-auto flex text-gray-700 space-x-3">
+      <div className="w-full sm:max-w-6xl mx-auto flex text-gray-700 space-x-3">
         {/* left sidebar */}
         <div className="w-10 sm:w-32 md:w-64 h-full">
           <div className="flex flex-col space-y-3">
@@ -157,10 +158,11 @@ const HomePage = () => {
           </div>
           <div className="flex mt-5 md:space-x-3 flex-col md:flex-row space-y-2 md:space-y-0 flex-wrap">
             <div className="w-44 h-24 rounded-md p-2 bg-blue-500 cursor-pointer text-white">
-              <p className="font-bold">fullstack-trello</p>
-            </div>
-            <div className="w-44 h-24 rounded-md p-2 bg-yellow-400 cursor-pointer text-white">
-              <p className="font-bold">mLab-report</p>
+              <Link to="/b/hiq24sd95de2iow02">
+                <p className="font-bold truncate hover:underline">
+                  fullstack-trello-clone
+                </p>
+              </Link>
             </div>
           </div>
         </div>

@@ -47,7 +47,7 @@ const Navbar = () => {
 
         <div className="h-8 flex flex-1 text-white text-opacity-50 items-center justify-center space-x-1">
           <FaTrello />
-          <p className="text-xl font-extrabold">Trello</p>
+          <p className="text-xl pr-40 font-extrabold">Trello</p>
         </div>
 
         <div className="ml-auto flex space-x-1 items-center">
