@@ -47,6 +47,19 @@
       "last 1 safari version"
     ]
   },
+  "keywords": [
+    "trello-clone",
+    "trello-board",
+    "react-dnd",
+    "drag and drop",
+    "react",
+    "typescript",
+    "trello-board-clone",
+    "fullstack-trello-clone",
+    "graphql",
+    "nodejs",
+    "react-trello-clone"
+  ],
   "devDependencies": {
     "@types/react-modal": "^3.12.1",
     "@types/react-router-dom": "^5.1.8",
