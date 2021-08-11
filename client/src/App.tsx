@@ -5,6 +5,8 @@ import './App.css';
 import Navbar from './Components/Navbar';
 import Board from './Pages/Board';
 import HomePage from './Pages/HomePage';
+import Login from './Pages/Login';
+import Register from './Pages/Register';
 import PageNotFound from './Pages/PageNotFound';
 
 ReactModal.setAppElement('#root');
@@ -18,6 +20,8 @@ const App = () => {
         style={{ maxHeight: `calc(100% - 2.5rem)` }}
       >
         <Switch>
+          <Route exact path="/" component={Login} />
+          <Route path="/register" component={Register} />
           <Route path="/boards" component={HomePage} />
           <Route path="/b/:boardId" component={Board} />
           <Route component={PageNotFound} />

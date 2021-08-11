@@ -7,6 +7,7 @@ import {
   FiTrello,
   GiSoundWaves,
   HiOutlineTable,
+  IoCloseOutline,
   IoPeopleSharp,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
@@ -16,6 +17,8 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   const [dropDown, setDropDown] = useState(false);
+  const [newBoard, setNewBoard] = useState(false);
+  const [newBoardName, setNewBoardName] = useState('');
 
   return (
     <div className="w-full flex mt-5">
@@ -164,6 +167,50 @@ const HomePage = () => {
                 </p>
               </Link>
             </div>
+            {!newBoard ? (
+              <button
+                onClick={() => setNewBoard(true)}
+                type="button"
+                className="w-44 h-24 flex items-center justify-center rounded-md p-2 bg-gray-100 cursor-pointer"
+              >
+                <p className="text-sm">Create new board</p>
+              </button>
+            ) : (
+              <div className="w-72  mt-10 mx-auto bg-gray-100 flex items-center justify-center rounded shadow p-2 text-gray-600">
+                <div className="w-full">
+                  <div className="w-full flex items-center justify-between px-2 mb-2">
+                    <p className="font-bold">Create New Board</p>
+                    <button
+                      type="button"
+                      className="w-6 h-6 rounded shadow outline-none hover:bg-gray-300 flex items-center justify-center"
+                      onClick={() => setNewBoard(false)}
+                    >
+                      <IoCloseOutline />
+                    </button>
+                  </div>
+                  <div className="w-full flex items-center justify-between">
+                    <input
+                      type="text"
+                      placeholder="Board name..."
+                      className="bg-transparent font-semibold flex-1 p-1 px-2 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded focus:bg-white"
+                      value={newBoardName}
+                      onChange={(e) => setNewBoardName(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className={`ml-5 w-12 h-8 rounded flex text-sm text-white items-center justify-center font-semibold shadow ${
+                        newBoardName === ''
+                          ? 'bg-blue-200 cursor-not-allowed'
+                          : 'bg-blue-500 hover:bg-blue-600'
+                      }`}
+                      disabled={newBoardName === ''}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

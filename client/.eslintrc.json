@@ -39,7 +39,8 @@
     "no-console": "off",
     "import/extensions": [0, "ignorePackages"],
     "jsx-a11y/click-events-have-key-events": [0],
-    "no-unused-expressions": "off"
+    "no-unused-expressions": "off",
+    "no-void": "off"
   },
   "settings": {
     "import/resolver": {

@@ -27,13 +27,15 @@ const Navbar = () => {
               <VscHome />
             </button>
           </Link>
-          <button
-            type="button"
-            className="flex h-8 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-2"
-          >
-            <FaTrello />{' '}
-            <span className="ml-2 text-sm font-semibold">Boards</span>
-          </button>
+          <Link to="/boards">
+            <button
+              type="button"
+              className="flex h-8 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-2"
+            >
+              <FaTrello />
+              <span className="ml-2 text-sm font-semibold">Boards</span>
+            </button>
+          </Link>
           <div className="hidden md:flex relative h-8 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-3">
             <input
               placeholder="Jump to..."
@@ -47,7 +49,9 @@ const Navbar = () => {
 
         <div className="h-8 flex flex-1 text-white text-opacity-50 items-center justify-center space-x-1">
           <FaTrello />
-          <p className="text-xl pr-40 font-extrabold">Trello</p>
+          <p className="text-xl pr-40 font-extrabold">
+            Trello<span className="text-gray-600">Clone</span>
+          </p>
         </div>
 
         <div className="ml-auto flex space-x-1 items-center">

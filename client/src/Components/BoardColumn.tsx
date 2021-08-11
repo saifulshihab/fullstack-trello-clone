@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDrop } from 'react-dnd';
 import { AiOutlinePlus } from 'react-icons/ai';
+import { IoCloseOutline } from 'react-icons/all';
 import { HiOutlineTemplate, HiOutlineVideoCamera } from 'react-icons/hi';
 import { MdMoreHoriz } from 'react-icons/md';
-import { IoCloseOutline } from 'react-icons/all';
-import { CardStatusType, itemType } from '../types';
+import { cardItemsFromServer, useCardDropContext } from '../Pages/Board';
+import { CardStatusType, DndTypes, itemType } from '../types';
 import Card from './Card';
 
 interface BoardColumnProps {
@@ -15,6 +17,7 @@ const BoardColumn = ({ cardStatus, itemList }: BoardColumnProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [newCard, setNewCard] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
+  const { dropHandler } = useCardDropContext();
 
   useEffect(() => {
     if (newCard) {
@@ -23,13 +26,27 @@ const BoardColumn = ({ cardStatus, itemList }: BoardColumnProps) => {
     }
   }, [newCard]);
 
+  // dnd hooks
+  const [{ isOver }, drop] = useDrop({
+    accept: DndTypes.CARD,
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    drop: (item: any) => {
+      return dropHandler(item.id, cardStatus);
+    },
+  });
+
   const newCardSubmitHandler = () => {
     if (newCardTitle !== '') {
-      itemList.push({
+      const newItem = {
         _id: Math.floor(Math.random() * 100).toString(),
         status: cardStatus,
         title: newCardTitle,
-      });
+      };
+      itemList.push(newItem);
+      cardItemsFromServer.push(newItem);
 
       setNewCardTitle('');
       setNewCard(false);
@@ -44,7 +61,10 @@ const BoardColumn = ({ cardStatus, itemList }: BoardColumnProps) => {
 
   return (
     <div
-      className="w-72 max-h-full flex flex-col rounded bg-gray-200"
+      ref={drop}
+      className={`w-72 max-h-full flex flex-col rounded ${
+        isOver ? 'bg-gray-300' : 'bg-gray-200'
+      }`}
       // style={{
       //   maxHeight: `calc(100% - ${itemList?.length > 0 ? '2.5rem' : '0rem'})`,
       // }}

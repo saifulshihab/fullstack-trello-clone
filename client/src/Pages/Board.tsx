@@ -1,10 +1,11 @@
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BiStar } from 'react-icons/bi';
 import { FaTrello } from 'react-icons/fa';
 import { MdKeyboardArrowDown, MdMoreHoriz, MdPublic } from 'react-icons/md';
 import BoardColumn from '../Components/BoardColumn';
 import { itemType } from '../types';
 
-const cardItems: itemType[] = [
+export const cardItemsFromServer: itemType[] = [
   {
     _id: '1',
     title: 'React Dnd',
@@ -34,14 +35,51 @@ const cardItems: itemType[] = [
     title: 'AWS',
     status: 'done',
   },
+  {
+    _id: '7',
+    title: 'Chakra UI',
+    status: 'done',
+  },
 ];
 
-const Board = () => {
-  const thingsToDoList = cardItems.filter((item) => item.status === 'todo');
-  const doingList = cardItems.filter((item) => item.status === 'doing');
-  const doneList = cardItems.filter((item) => item.status === 'done');
+const CardDropHandlerContext = createContext<{
+  // eslint-disable-next-line no-unused-vars
+  dropHandler(id: string, status: string): void;
+} | null>(null);
 
-  console.log('rendering... board');
+const Board = () => {
+  const [cardItems, setCardItems] = useState<itemType[] | []>([]);
+  const [todoItems, setTodoItems] = useState<itemType[] | []>([]);
+  const [doingItems, setDoingItems] = useState<itemType[] | []>([]);
+  const [doneItems, setDoneItems] = useState<itemType[] | []>([]);
+
+  useEffect(() => {
+    if (cardItemsFromServer) {
+      setCardItems(cardItemsFromServer);
+
+      const todo = cardItems.filter((item) => item.status === 'todo');
+      const doing = cardItems.filter((item) => item.status === 'doing');
+      const done = cardItems.filter((item) => item.status === 'done');
+
+      // set items
+      setTodoItems(todo);
+      setDoingItems(doing);
+      setDoneItems(done);
+    }
+  }, [cardItems]);
+
+  // changing card status while drop end
+  const dropHandler = (id: string, status: string) => {
+    const selectedItem = cardItems.filter((item) => item._id === id)[0];
+    selectedItem.status = status;
+    setCardItems(
+      cardItems.filter((item) => item._id !== id).concat(selectedItem)
+    );
+  };
+
+  console.log('rendering board component...');
+  console.log(cardItems);
+
   return (
     <div
       className="w-full h-full"
@@ -143,16 +181,26 @@ const Board = () => {
         </div>
         {/* board content */}
         <div className="w-full flex items-start flex-no-wrap overflow-x-auto space-x-3 p-1 text-gray-600">
-          {/* to do */}
-          <BoardColumn cardStatus="todo" itemList={thingsToDoList} />
-          {/* doing */}
-          <BoardColumn cardStatus="doing" itemList={doingList} />
-          {/* done */}
-          <BoardColumn cardStatus="done" itemList={doneList} />
+          <CardDropHandlerContext.Provider value={{ dropHandler }}>
+            {/* to do */}
+            <BoardColumn cardStatus="todo" itemList={todoItems} />
+            {/* doing */}
+            <BoardColumn cardStatus="doing" itemList={doingItems} />
+            {/* done */}
+            <BoardColumn cardStatus="done" itemList={doneItems} />
+          </CardDropHandlerContext.Provider>
         </div>
       </div>
     </div>
   );
+};
+
+export const useCardDropContext = () => {
+  const context = useContext(CardDropHandlerContext);
+
+  if (!context) throw Error('No context');
+
+  return context;
 };
 
 export default Board;

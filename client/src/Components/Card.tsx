@@ -6,28 +6,15 @@ import { GrAttachment } from 'react-icons/gr';
 import { ImParagraphLeft } from 'react-icons/im';
 import { IoCloseOutline, IoPersonOutline } from 'react-icons/io5';
 import { MdDateRange } from 'react-icons/md';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 import { VscChecklist } from 'react-icons/vsc';
-import ReactModal from 'react-modal';
-import { CardStatusType, itemType } from '../types';
+import { CardStatusType, itemType, DndTypes } from '../types';
+import ReactModal from './ReactModal';
 
 interface CardProps {
   item: itemType;
   cardStatus: CardStatusType;
 }
-
-const modalStyles = {
-  overlay: {
-    backgroundColor: 'rgb(0 0 0 / 75%)',
-  },
-  content: {
-    top: '50px',
-    left: '20%',
-    right: '20%',
-    bottom: '50px',
-    backgroundColor: '#f4f5f7',
-    padding: '10px',
-  },
-};
 
 const initialState: itemType = {
   _id: '',
@@ -71,16 +58,14 @@ const Card = ({ item, cardStatus }: CardProps) => {
     }
   }, [descEdit]);
 
-  const [{ opacity }, dragRef] = useDrag(
+  // dnd hooks
+  const [{ isDragging }, dragRef] = useDrag(
     {
-      type: 'div',
-      item: { _id: item._id },
+      type: DndTypes.CARD,
+      item: { id: item._id },
       collect: (monitor) => ({
-        opacity: monitor.isDragging() ? 0.5 : 1,
+        isDragging: !!monitor.isDragging(),
       }),
-      end: () => {
-        console.log(item._id);
-      },
     },
     []
   );
@@ -101,8 +86,9 @@ const Card = ({ item, cardStatus }: CardProps) => {
   return (
     <div
       ref={dragRef}
-      className="w-full bg-white h-12 flex-shrink-0 px-3 text-sm rounded shadow cursor-pointer"
-      style={{ opacity }}
+      className={`w-full bg-white h-12 flex-shrink-0 px-3 text-sm rounded shadow cursor-pointer ${
+        isDragging ? 'hidden' : 'block'
+      }`}
       onClick={() => setModalOpen(true)}
       role="presentation"
     >
@@ -120,12 +106,7 @@ const Card = ({ item, cardStatus }: CardProps) => {
         </div>
       </div>
       <p className="w-full truncate">{item?.title}</p>
-      <ReactModal
-        isOpen={modalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Example Modal"
-        style={modalStyles}
-      >
+      <ReactModal modalOpen={modalOpen} closeModal={closeModal}>
         <div className="w-full p-2 text-gray-700">
           <div className="w-full flex items-center space-x-4">
             <div className="flex-1 flex items-center space-x-3 text-xl">
@@ -142,13 +123,21 @@ const Card = ({ item, cardStatus }: CardProps) => {
                 className="w-full bg-transparent font-bold focus:outline-none focus:bg-white rounded px-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <button
-              type="button"
-              onClick={closeModal}
-              className="w-8 h-8 flex items-center justify-center bg-gray-200 font-bold text-xl hover:bg-gray-300 rounded-full cursor-pointer"
-            >
-              <IoCloseOutline />
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                className="w-8 h-8 flex text-sm items-center justify-center bg-red-300 font-bold hover:bg-red-400 rounded-full cursor-pointer"
+              >
+                <RiDeleteBin6Line />
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="w-8 h-8 flex items-center justify-center bg-gray-200 font-bold text-xl hover:bg-gray-300 rounded-full cursor-pointer"
+              >
+                <IoCloseOutline />
+              </button>
+            </div>
           </div>
           <div className="w-full flex space-x-3 mt-3">
             <div className="flex-1 ">
