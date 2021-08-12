@@ -1,11 +1,42 @@
-import http from 'http';
 import express from 'express';
+import { ApolloServer, gql } from 'apollo-server-express';
+import dotenv from 'dotenv';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 
-const app = express();
+// load environment variables
+dotenv.config();
 
-const server = http.createServer(app);
+const main = async () => {
+  // database connection
 
-const PORT = process.env.PORT || 5001;
-server.listen(PORT, () => {
-  console.log('\n🚀 Server is running & up...🚀');
-});
+  // graphql schema
+  const typeDefs = gql`
+    type Query {
+      hello: String
+    }
+  `;
+  // graphql resolvers
+  const resolvers = {
+    Query: {
+      hello: () => 'World!',
+    },
+  };
+
+  const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+  });
+  await apolloServer.start();
+
+  const app = express();
+  apolloServer.applyMiddleware({ app });
+
+  app.listen(4000, 'localhost', () => {
+    console.log(
+      `🚀 Server ready at http://localhost:4000${apolloServer.graphqlPath}`
+    );
+  });
+};
+
+main().catch((error) => console.log(error));
