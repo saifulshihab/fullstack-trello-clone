@@ -1,11 +1,22 @@
+import { useApolloClient } from '@apollo/client';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { BiInfoCircle, BiSearch } from 'react-icons/bi';
+import {
+  BiInfoCircle,
+  BiLogInCircle,
+  BiLogOutCircle,
+  BiSearch,
+} from 'react-icons/bi';
 import { BsGrid3X3Gap } from 'react-icons/bs';
 import { FaRegBell, FaTrello } from 'react-icons/fa';
 import { VscHome } from 'react-icons/vsc';
 import { Link } from 'react-router-dom';
+import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 
 const Navbar = () => {
+  const apolloClient = useApolloClient();
+  const { data } = useMeQuery();
+  const [logout] = useLogoutMutation();
+
   return (
     <div
       className="w-full h-10 p-1 text-white"
@@ -73,16 +84,45 @@ const Navbar = () => {
           >
             <BiInfoCircle />
           </button>
-          <button
-            type="button"
-            className="flex w-8 h-8 bg-gray-100 items-center justify-center text-xl rounded-full bg-opacity-30 hover:bg-opacity-20"
-          >
-            <img
-              className="w-full h-full rounded-full"
-              src="https://picsum.photos/200"
-              alt="dp"
-            />
-          </button>
+          {data?.me ? (
+            <>
+              <button
+                type="button"
+                className="flex w-8 h-8 items-center justify-center text-xl rounded-full bg-opacity-30 hover:bg-opacity-20"
+              >
+                <img
+                  className="w-full h-full rounded-full"
+                  src="https://picsum.photos/200"
+                  alt="dp"
+                />
+              </button>
+              <button
+                type="button"
+                className="flex h-8 px-2 items-center space-x-1 rounded shadow text-sm bg-red-500 hover:bg-red-600"
+                onClick={async () => {
+                  await logout();
+                  await apolloClient.resetStore();
+                }}
+              >
+                <div>
+                  <BiLogOutCircle />
+                </div>
+                <p>Logout</p>
+              </button>
+            </>
+          ) : (
+            <Link to="/login">
+              <button
+                type="button"
+                className="flex h-8 px-2 items-center space-x-1 rounded shadow text-sm bg-green-500 hover:bg-green-600"
+              >
+                <div>
+                  <BiLogInCircle />
+                </div>
+                <p>Login</p>
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

@@ -15,5 +15,19 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "prettier"],
-  "rules": {}
+  "rules": {
+    "no-console": "off",
+    "import/extensions": [0],
+    "class-methods-use-this": "off",
+    "max-classes-per-file": [0],
+    "no-shadow": "off",
+    "no-underscore-dangle": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"]
+      }
+    }
+  }
 }

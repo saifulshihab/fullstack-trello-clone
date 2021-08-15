@@ -15,7 +15,7 @@ import {
 } from 'react-icons/all';
 import { Link } from 'react-router-dom';
 
-const HomePage = () => {
+const Boards = () => {
   const [dropDown, setDropDown] = useState(false);
   const [newBoard, setNewBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
@@ -218,4 +218,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Boards;

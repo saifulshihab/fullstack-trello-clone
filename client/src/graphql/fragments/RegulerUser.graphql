@@ -1,0 +1,4 @@
+fragment RegulerUser on User {
+  _id
+  username
+}

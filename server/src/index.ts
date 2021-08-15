@@ -1,36 +1,73 @@
-import express from 'express';
-import { ApolloServer, gql } from 'apollo-server-express';
-import dotenv from 'dotenv';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import { ApolloServer } from 'apollo-server-express';
+import connectRedis from 'connect-redis';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import session from 'express-session';
+import Redis from 'ioredis';
+import 'reflect-metadata';
+import { buildSchema } from 'type-graphql';
+import connectDB from './config/db';
+import { COKKIE_NAME, __prod__ } from './constants';
+import UserResolver from './resolvers/UserResolver';
+import MyContext from './types';
+
+declare module 'express-session' {
+  interface SessionData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    userId?: any;
+  }
+}
 
 // load environment variables
 dotenv.config();
 
 const main = async () => {
   // database connection
+  await connectDB();
 
-  // graphql schema
-  const typeDefs = gql`
-    type Query {
-      hello: String
-    }
-  `;
-  // graphql resolvers
-  const resolvers = {
-    Query: {
-      hello: () => 'World!',
-    },
-  };
+  const app = express();
+
+  // cors policy
+  // app.options('*', cors());
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    })
+  );
+
+  const RedisStore = connectRedis(session);
+  const redis = new Redis();
+
+  // session
+  app.use(
+    session({
+      name: COKKIE_NAME,
+      store: new RedisStore({ client: redis, disableTouch: true }),
+      cookie: {
+        maxAge: 1000 * 60 * 60, // 1 day
+        httpOnly: true,
+        secure: __prod__,
+        sameSite: 'lax', // csrf
+      },
+      saveUninitialized: false,
+      secret: 'tr7878wedj#ekjfelioe8llo',
+      resave: false,
+    })
+  );
 
   const apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema: await buildSchema({
+      resolvers: [UserResolver],
+    }),
+    context: ({ req, res }): MyContext => ({ req, res, redis }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
   await apolloServer.start();
 
-  const app = express();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, 'localhost', () => {
     console.log(

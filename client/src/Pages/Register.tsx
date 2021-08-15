@@ -1,9 +1,12 @@
-import React from 'react';
+import { Formik } from 'formik';
+import { Link, useHistory } from 'react-router-dom';
+import InputField from '../Components/InputField';
+import { MeQuery, MeDocument, useRegisterMutation } from '../generated/graphql';
+import toErrorMap from '../utils/toErrorMap';
 
 const Register = () => {
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  };
+  const history = useHistory();
+  const [register, { loading }] = useRegisterMutation();
   return (
     <div className="w-80 mt-5 mx-auto">
       <div className="w-full flex items-center justify-center text-gray-700">
@@ -11,27 +14,66 @@ const Register = () => {
           Trello<span className="text-blue-600">Clone</span> Registration
         </p>
       </div>
-      <form className="w-full mt-3" onSubmit={submitHandler}>
-        <input
-          type="text"
-          className="appearance-none rounded relative block w-full px-3 py-2 border-2 border-blue-200 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Username or email"
-          required
-        />
-        <input
-          type="password"
-          className="appearance-none mt-2 rounded relative block w-full px-3 py-2 border-2 border-blue-200 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Password"
-          required
-        />
-        <button
-          type="submit"
-          className="mt-3 group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white  'bg-indigo-600'
+      <Formik
+        initialValues={{
+          email: '',
+          username: '',
+          password: '',
+        }}
+        onSubmit={async (values, { setErrors }) => {
+          const response = await register({
+            variables: { registerInput: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  me: data?.register.user,
+                },
+              });
+            },
+          });
+          if (response.data?.register.errors) {
+            setErrors(toErrorMap(response.data?.register.errors));
+          } else {
+            history.push('/boards');
+          }
+        }}
+      >
+        {({ handleSubmit, isSubmitting }) => (
+          <form className="w-full mt-3" onSubmit={handleSubmit}>
+            <InputField
+              type="text"
+              name="email"
+              placeholder="Enter your email"
+            />
+            <InputField
+              type="text"
+              name="username"
+              placeholder="Choose a username"
+            />
+            <InputField
+              type="password"
+              name="password"
+              placeholder="Password"
+            />
+            <div className="mt-2 w-full flex items-center justify-end">
+              <Link to="/register">
+                <p className="text-xs font-semibold text-blue-600">
+                  Not Registered?
+                </p>
+              </Link>
+            </div>
+            <button
+              disabled={isSubmitting}
+              type="submit"
+              className="mt-2 group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white  'bg-indigo-600'
               bg-blue-600 focus:outline-none"
-        >
-          Register
-        </button>
-      </form>
+            >
+              Register {loading && '...'}
+            </button>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 };
