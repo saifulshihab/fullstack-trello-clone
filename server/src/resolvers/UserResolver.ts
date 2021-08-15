@@ -48,8 +48,6 @@ export class RegisterInput {
 export default class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext): Promise<User | null> {
-    console.log(req.session);
-    console.log(req.session.userId);
     if (!req.session.userId) {
       return null;
     }
