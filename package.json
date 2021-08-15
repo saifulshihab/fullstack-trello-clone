@@ -5,6 +5,22 @@
   "scripts": {
     "postinstall": "husky install"
   },
+  "keywords": [
+    "trello-clone",
+    "trello-board",
+    "react-dnd",
+    "drag and drop",
+    "react",
+    "typescript",
+    "trello-board-clone",
+    "fullstack-trello-clone",
+    "graphql",
+    "nodejs",
+    "react-trello-clone",
+    "apollo-client",
+    "react graphql",
+    "react graphql project"
+  ],
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
