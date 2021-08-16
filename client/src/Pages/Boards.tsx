@@ -14,11 +14,53 @@ import {
   RiSettings5Line,
 } from 'react-icons/all';
 import { Link } from 'react-router-dom';
+import Loader from '../Components/Loader';
+import {
+  useBoardsQuery,
+  useCreateBoardMutation,
+  BoardsDocument,
+} from '../generated/graphql';
+
+interface ErrorType {
+  message: string;
+  __typename?: string | undefined;
+}
 
 const Boards = () => {
   const [dropDown, setDropDown] = useState(false);
   const [newBoard, setNewBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
+  const [createBoardError, setCreateBoardError] = useState<ErrorType | null>(
+    null
+  );
+
+  const { data, loading: boardsLoading } = useBoardsQuery();
+  const [createBoard, { loading: createBoardLoading }] =
+    useCreateBoardMutation();
+
+  const createBoardHandler = async () => {
+    const response = await createBoard({
+      variables: { boardName: newBoardName },
+      update: (cache, { data: newData }) => {
+        if (newData?.createBoard?.board !== null) {
+          cache.writeQuery({
+            query: BoardsDocument,
+            data: {
+              __typename: 'Query',
+              boards: [...(data?.boards || []), newData?.createBoard?.board],
+            },
+          });
+        }
+      },
+    });
+    if (response.data?.createBoard?.errors) {
+      setCreateBoardError(response.data?.createBoard?.errors);
+    } else {
+      setNewBoard(false);
+      setNewBoardName('');
+      setCreateBoardError(null);
+    }
+  };
 
   return (
     <div className="w-full flex mt-5">
@@ -159,46 +201,70 @@ const Boards = () => {
               </div>
             </div>
           </div>
-          <div className="flex mt-5 md:space-x-3 flex-col md:flex-row space-y-2 md:space-y-0 flex-wrap">
-            <div className="w-44 h-24 rounded-md p-2 bg-blue-500 cursor-pointer text-white">
-              <Link to="/b/hiq24sd95de2iow02">
-                <p className="font-bold truncate hover:underline">
-                  fullstack-trello-clone
-                </p>
-              </Link>
+          {createBoardError && (
+            <div className="mt-3">
+              <p className="p-2 bg-red-100 text-sm font-semibold text-red-500">
+                {createBoardError?.message}
+              </p>
             </div>
+          )}
+          <div className="grid mt-3 grid-cols-4 gap-2">
+            {boardsLoading ? (
+              <Loader />
+            ) : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            !boardsLoading ? (
+              data?.boards.map((board) => (
+                <div
+                  key={board?._id}
+                  className="col-span-1 h-24 rounded-md p-2 bg-blue-500 cursor-pointer text-white"
+                >
+                  <Link to={`/b/${board?._id}`}>
+                    <p className="font-bold w-full h-full hover:underline">
+                      {board?.boardName}
+                    </p>
+                  </Link>
+                </div>
+              ))
+            ) : null}
             {!newBoard ? (
               <button
                 onClick={() => setNewBoard(true)}
                 type="button"
-                className="w-44 h-24 flex items-center justify-center rounded-md p-2 bg-gray-100 cursor-pointer"
+                className="col-span-1 h-24 flex items-center justify-center rounded-md p-2 bg-gray-100 cursor-pointer"
               >
                 <p className="text-sm">Create new board</p>
               </button>
             ) : (
-              <div className="w-72  mt-10 mx-auto bg-gray-100 flex items-center justify-center rounded shadow p-2 text-gray-600">
-                <div className="w-full">
-                  <div className="w-full flex items-center justify-between px-2 mb-2">
-                    <p className="font-bold">Create New Board</p>
-                    <button
-                      type="button"
-                      className="w-6 h-6 rounded shadow outline-none hover:bg-gray-300 flex items-center justify-center"
-                      onClick={() => setNewBoard(false)}
-                    >
-                      <IoCloseOutline />
-                    </button>
-                  </div>
-                  <div className="w-full flex items-center justify-between">
+              <div className="col-span-1 h-24 bg-gray-100 rounded shadow p-2 text-gray-600">
+                <div className="w-full flex items-center justify-between mb-4">
+                  <p className="text-sm">Create New Board</p>
+                  <button
+                    type="button"
+                    className="w-6 h-6 rounded shadow outline-none hover:bg-gray-300 flex items-center justify-center"
+                    onClick={() => setNewBoard(false)}
+                  >
+                    <IoCloseOutline />
+                  </button>
+                </div>
+                <div className="w-full flex items-center">
+                  <div className="flex-1">
                     <input
                       type="text"
                       placeholder="Board name..."
-                      className="bg-transparent font-semibold flex-1 p-1 px-2 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded focus:bg-white"
+                      className="bg-transparent font-semibold w-full p-1 px-2 border border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600 rounded focus:bg-white"
                       value={newBoardName}
                       onChange={(e) => setNewBoardName(e.target.value)}
                     />
+                  </div>
+                  {createBoardLoading ? (
+                    <div className="ml-2">
+                      <Loader />
+                    </div>
+                  ) : (
                     <button
+                      onClick={createBoardHandler}
                       type="button"
-                      className={`ml-5 w-12 h-8 rounded flex text-sm text-white items-center justify-center font-semibold shadow ${
+                      className={`ml-2 w-12 h-8 rounded flex text-sm text-white items-center justify-center font-semibold shadow ${
                         newBoardName === ''
                           ? 'bg-blue-200 cursor-not-allowed'
                           : 'bg-blue-500 hover:bg-blue-600'
@@ -207,7 +273,7 @@ const Boards = () => {
                     >
                       Add
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
             )}

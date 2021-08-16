@@ -20,7 +20,6 @@ const App = () => {
         style={{ maxHeight: `calc(100% - 2.5rem)` }}
       >
         <Switch>
-          <Route exact path="/" component={Login} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <PrivateRoute path="/boards" component={Boards} />

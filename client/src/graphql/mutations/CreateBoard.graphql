@@ -1,0 +1,10 @@
+mutation CreateBoard($boardName: String!) {
+  createBoard(boardName: $boardName) {
+    errors {
+      message
+    }
+    board {
+      ...BoardInfo
+    }
+  }
+}

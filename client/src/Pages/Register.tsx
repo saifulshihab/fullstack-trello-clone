@@ -1,5 +1,5 @@
 import { Formik } from 'formik';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import InputField from '../Components/InputField';
 import { MeQuery, MeDocument, useRegisterMutation } from '../generated/graphql';
 import toErrorMap from '../utils/toErrorMap';
@@ -55,14 +55,8 @@ const Register = () => {
               type="password"
               name="password"
               placeholder="Password"
+              autoComplete="password"
             />
-            <div className="mt-2 w-full flex items-center justify-end">
-              <Link to="/register">
-                <p className="text-xs font-semibold text-blue-600">
-                  Not Registered?
-                </p>
-              </Link>
-            </div>
             <button
               disabled={isSubmitting}
               type="submit"

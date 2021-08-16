@@ -10,7 +10,12 @@ import { BsGrid3X3Gap } from 'react-icons/bs';
 import { FaRegBell, FaTrello } from 'react-icons/fa';
 import { VscHome } from 'react-icons/vsc';
 import { Link } from 'react-router-dom';
-import { useLogoutMutation, useMeQuery } from '../generated/graphql';
+import {
+  MeDocument,
+  MeQuery,
+  useLogoutMutation,
+  useMeQuery,
+} from '../generated/graphql';
 
 const Navbar = () => {
   const apolloClient = useApolloClient();
@@ -100,7 +105,16 @@ const Navbar = () => {
                 type="button"
                 className="flex h-8 px-2 items-center space-x-1 rounded shadow text-sm bg-red-500 hover:bg-red-600"
                 onClick={async () => {
-                  await logout();
+                  await logout({
+                    update: (cache) => {
+                      cache.writeQuery<MeQuery>({
+                        query: MeDocument,
+                        data: {
+                          me: null,
+                        },
+                      });
+                    },
+                  });
                   await apolloClient.resetStore();
                 }}
               >

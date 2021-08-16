@@ -13,14 +13,18 @@ import toErrorMap from '../utils/toErrorMap';
 const Login = () => {
   const history = useHistory();
   const [login, { loading }] = useLoginMutation();
-  const { data: meData } = useMeQuery();
+  const { data: meData, error } = useMeQuery();
 
   useEffect(() => {
-    if (meData?.me) {
+    if (!error && meData?.me) {
+      console.log('push to boards');
       history.push('/boards');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history, meData?.me]);
+  }, [history, meData?.me, error]);
+
+  console.log(meData);
+  console.log(error);
   return (
     <div className="w-80 mt-5 mx-auto">
       <div className="w-full flex items-center justify-center text-gray-700">
@@ -63,6 +67,7 @@ const Login = () => {
               type="password"
               name="password"
               placeholder="Password"
+              autoComplete="password"
             />
             <div className="mt-2 w-full flex items-center justify-end">
               <Link to="/register">

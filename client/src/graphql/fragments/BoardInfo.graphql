@@ -1,0 +1,5 @@
+fragment BoardInfo on Board {
+  _id
+  boardName
+  user
+}
