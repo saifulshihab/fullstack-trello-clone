@@ -2,7 +2,7 @@
 
 Full Stack Trello board clone using React &amp; GraphQL.
 
-## Feature to be developed:
+## Features:
 
 - Login/Register
 - Create board
