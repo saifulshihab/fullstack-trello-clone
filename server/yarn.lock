@@ -333,12 +333,34 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.5.tgz#1001cc5e6a3704b83c236027e77f2f58ea010f40"
   integrity sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==
 
+"@types/mongodb@*":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-4.0.7.tgz#ebaa80c53b684ea52ccfe7721c0f5c9ef7b4f511"
+  integrity sha512-lPUYPpzA43baXqnd36cZ9xxorprybxXDzteVKCPAdp14ppHtFJHnXYvNpmBvtMUTb5fKXVv6sVbzo1LHkWhJlw==
+  dependencies:
+    mongodb "*"
+
 "@types/mongodb@^3.5.27":
   version "3.6.20"
   resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-3.6.20.tgz#b7c5c580644f6364002b649af1c06c3c0454e1d2"
   integrity sha512-WcdpPJCakFzcWWD9juKoZbRtQxKIMYF/JIAM4JrNHrMcnJL6/a2NWjXxW7fo9hxboxxkg+icff8d7+WIEvKgYQ==
   dependencies:
     "@types/bson" "*"
+    "@types/node" "*"
+
+"@types/mongoose-autopopulate@^0.10.2":
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/@types/mongoose-autopopulate/-/mongoose-autopopulate-0.10.2.tgz#d536b765af999969c1f41957f27937d62b954717"
+  integrity sha512-YSxSEhszXK9E+7VRLdpYjkXqcRXOPFtG0xZea9n7A+oaHhZ1lSVBm/WvK2Rr746NPrTm/k1tR6uezyG6kyinyg==
+  dependencies:
+    "@types/mongoose" "5.10.5"
+
+"@types/mongoose@5.10.5":
+  version "5.10.5"
+  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.10.5.tgz#0f4fb0440e8cf0213caec1e5c7b163dbd9847c56"
+  integrity sha512-37QMIA954T3n+HSksSNLlxZsqF8fMJu5S4dyPBod6gRxGtsXlQ9jUtL8BE8Seimv99u79eLXI3bggoCnSQ/fxQ==
+  dependencies:
+    "@types/mongodb" "*"
     "@types/node" "*"
 
 "@types/node@*", "@types/node@^16.4.13":
@@ -2565,6 +2587,17 @@ mongodb-connection-string-url@^1.0.1:
     "@types/whatwg-url" "^8.0.0"
     whatwg-url "^8.4.0"
 
+mongodb@*, mongodb@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.1.0.tgz#f491de5d52003f41dffbc6ebfd8b95be21174d63"
+  integrity sha512-Gx9U9MsFWgJ3E0v4oHAdWvYTGBznNYPCkhmD/3i/kPTY/URnPfHD5/6VoKUFrdgQTK3icFiM9976hVbqCRBO9Q==
+  dependencies:
+    bson "^4.4.0"
+    denque "^1.5.0"
+    mongodb-connection-string-url "^1.0.1"
+  optionalDependencies:
+    saslprep "^1.0.0"
+
 mongodb@3.6.11:
   version "3.6.11"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.6.11.tgz#8a59a0491a92b00a8c925f72ed9d9a5b054aebb2"
@@ -2578,16 +2611,10 @@ mongodb@3.6.11:
   optionalDependencies:
     saslprep "^1.0.0"
 
-mongodb@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-4.1.0.tgz#f491de5d52003f41dffbc6ebfd8b95be21174d63"
-  integrity sha512-Gx9U9MsFWgJ3E0v4oHAdWvYTGBznNYPCkhmD/3i/kPTY/URnPfHD5/6VoKUFrdgQTK3icFiM9976hVbqCRBO9Q==
-  dependencies:
-    bson "^4.4.0"
-    denque "^1.5.0"
-    mongodb-connection-string-url "^1.0.1"
-  optionalDependencies:
-    saslprep "^1.0.0"
+mongoose-autopopulate@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/mongoose-autopopulate/-/mongoose-autopopulate-0.14.0.tgz#cfe69a877c10c7965b7f13f3d9dd410ec6f8f429"
+  integrity sha512-3EsOeFpEAwK2XQntI9CUf7dOq5HpI3lZFYzXukD0ep0Ctmdewgyt5VgS64Afuf/K6QggLt9RKsjexVphnhmeXg==
 
 mongoose-legacy-pluralize@1.0.2:
   version "1.0.2"

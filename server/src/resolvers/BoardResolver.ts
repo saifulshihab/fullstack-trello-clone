@@ -49,7 +49,7 @@ export default class BoardResolver {
     if (boardName.length < 3) {
       return {
         errors: {
-          message: 'Must be 3 character!',
+          message: 'Board name must be greater then 3 character!',
         },
       };
     }
@@ -70,7 +70,7 @@ export default class BoardResolver {
 
   @Query(() => [Board])
   @UseMiddleware(isAuth)
-  async boards(@Ctx() { req }: MyContext): Promise<Board[]> {
+  async boards(@Ctx() { req }: MyContext): Promise<Board[] | []> {
     const boards = await BoardModel.find({ user: req.session.userId });
 
     return boards;
