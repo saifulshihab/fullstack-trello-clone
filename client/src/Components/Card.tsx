@@ -1,3 +1,4 @@
+/* eslint-disable react/self-closing-comp */
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import { BiCreditCard, BiLabel } from 'react-icons/bi';
@@ -8,25 +9,34 @@ import { IoCloseOutline, IoPersonOutline } from 'react-icons/io5';
 import { MdDateRange } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { VscChecklist } from 'react-icons/vsc';
-import { CardStatusType, itemType, DndTypes } from '../types';
+import {
+  CardsDocument,
+  CardsQuery,
+  CardInputType,
+  useDeleteCardMutation,
+  useEditCardMutation,
+} from '../generated/graphql';
+import { CardStatusType, DndTypes } from '../types';
+import Loader from './Loader';
 import ReactModal from './ReactModal';
 
 interface CardProps {
-  item: itemType;
+  item: CardInputType;
   cardStatus: CardStatusType;
 }
 
-const initialState: itemType = {
+const initialState: CardInputType = {
   _id: '',
   title: '',
   description: '',
   status: '',
+  board: '',
 };
 
 type ACTIONTYPE =
   | { type: 'setTitle'; value: string }
   | { type: 'setDescription'; value: string }
-  | { type: 'setItemInput'; value: itemType };
+  | { type: 'setItemInput'; value: CardInputType };
 
 const inputReducer = (state: typeof initialState, action: ACTIONTYPE) => {
   switch (action.type) {
@@ -47,6 +57,9 @@ const Card = ({ item, cardStatus }: CardProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [descEdit, setDescEdit] = useState(false);
   const [itemInput, dispatch] = useReducer(inputReducer, initialState);
+
+  const [deleteCard, { loading: deleteCardLoading }] = useDeleteCardMutation();
+  const [editCard] = useEditCardMutation();
 
   useEffect(() => {
     dispatch({ type: 'setItemInput', value: item });
@@ -75,12 +88,47 @@ const Card = ({ item, cardStatus }: CardProps) => {
     setModalOpen(false);
   };
 
-  const titleChangedAndSave = () => {
-    console.log(itemInput);
+  const input = {
+    _id: itemInput._id,
+    title: itemInput.title,
+    description: itemInput.description,
+    status: itemInput.status,
+    board: itemInput.board,
   };
 
-  const descChangedAndSave = () => {
-    console.log(itemInput);
+  const titleChangedAndSave = async () => {
+    await editCard({ variables: { cardInput: input } });
+  };
+
+  const descChangedAndSave = async () => {
+    await editCard({ variables: { cardInput: input } });
+  };
+
+  const deleteCardHandler = async () => {
+    const response = await deleteCard({
+      variables: { cardId: item._id },
+      update: (cache, { data: upcomingData }) => {
+        const readData = cache.readQuery<CardsQuery>({
+          query: CardsDocument,
+          variables: { board: item.board },
+        });
+
+        const slicedData = readData?.cards.filter(
+          (d) => d._id !== upcomingData?.deleteCard.card?._id
+        );
+
+        cache.writeQuery({
+          query: CardsDocument,
+          data: {
+            cards: slicedData,
+          },
+          variables: { board: item.board },
+        });
+      },
+    });
+    if (!response.errors) {
+      setModalOpen(false);
+    }
   };
 
   return (
@@ -125,10 +173,11 @@ const Card = ({ item, cardStatus }: CardProps) => {
             </div>
             <div className="flex items-center space-x-2">
               <button
+                onClick={deleteCardHandler}
                 type="button"
                 className="w-8 h-8 flex text-sm items-center justify-center bg-red-300 font-bold hover:bg-red-400 rounded-full cursor-pointer"
               >
-                <RiDeleteBin6Line />
+                {deleteCardLoading ? <Loader /> : <RiDeleteBin6Line />}
               </button>
               <button
                 type="button"
@@ -164,14 +213,14 @@ const Card = ({ item, cardStatus }: CardProps) => {
                   id="description"
                   name="description"
                   className="w-full bg-gray-200 focus:bg-white rounded p-1 px-2 outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  value={itemInput?.description}
+                  defaultValue={
+                    itemInput?.description ? itemInput?.description : ''
+                  }
                   onClick={() => setDescEdit(true)}
                   onChange={(e) =>
                     dispatch({ type: 'setDescription', value: e.target.value })
                   }
-                >
-                  {' '}
-                </textarea>
+                ></textarea>
                 {descEdit && (
                   <div className="flex items-center mt-2 space-x-2">
                     <button

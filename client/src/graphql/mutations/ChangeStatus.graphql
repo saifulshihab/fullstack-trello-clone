@@ -1,0 +1,5 @@
+mutation ChangeStatus($status: String!, $cardId: String!) {
+  changeStatus(status: $status, cardId: $cardId) {
+    ...RegulerCard
+  }
+}

@@ -18,7 +18,7 @@ export type Board = {
   __typename?: 'Board';
   _id: Scalars['String'];
   boardName: Scalars['String'];
-  user: Scalars['String'];
+  user: User;
 };
 
 export type BoardCreateError = {
@@ -32,6 +32,45 @@ export type BoardCreateResponse = {
   board?: Maybe<Board>;
 };
 
+export type Card = {
+  __typename?: 'Card';
+  _id: Scalars['String'];
+  title: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  status: Scalars['String'];
+  board: Scalars['String'];
+};
+
+export type CardDeleteError = {
+  __typename?: 'CardDeleteError';
+  message?: Maybe<Scalars['String']>;
+};
+
+export type CardDeleteResponse = {
+  __typename?: 'CardDeleteResponse';
+  errors?: Maybe<CardDeleteError>;
+  card?: Maybe<Card>;
+};
+
+export type CardInputType = {
+  _id: Scalars['String'];
+  title: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  status: Scalars['String'];
+  board: Scalars['String'];
+};
+
+export type CardUpdateError = {
+  __typename?: 'CardUpdateError';
+  message?: Maybe<Scalars['String']>;
+};
+
+export type CardUpdateResponse = {
+  __typename?: 'CardUpdateResponse';
+  errors?: Maybe<CardUpdateError>;
+  card?: Maybe<Card>;
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -41,6 +80,10 @@ export type FieldError = {
 export type Mutation = {
   __typename?: 'Mutation';
   createBoard?: Maybe<BoardCreateResponse>;
+  createCard: Card;
+  editCard: CardUpdateResponse;
+  deleteCard: CardDeleteResponse;
+  changeStatus: Card;
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -49,6 +92,29 @@ export type Mutation = {
 
 export type MutationCreateBoardArgs = {
   boardName: Scalars['String'];
+};
+
+
+export type MutationCreateCardArgs = {
+  status: Scalars['String'];
+  board: Scalars['String'];
+  title: Scalars['String'];
+};
+
+
+export type MutationEditCardArgs = {
+  cardInput: CardInputType;
+};
+
+
+export type MutationDeleteCardArgs = {
+  cardId: Scalars['String'];
+};
+
+
+export type MutationChangeStatusArgs = {
+  status: Scalars['String'];
+  cardId: Scalars['String'];
 };
 
 
@@ -65,7 +131,13 @@ export type MutationLoginArgs = {
 export type Query = {
   __typename?: 'Query';
   boards: Array<Board>;
+  cards: Array<Card>;
   me?: Maybe<User>;
+};
+
+
+export type QueryCardsArgs = {
+  board: Scalars['String'];
 };
 
 export type RegisterInput = {
@@ -87,16 +159,49 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
-export type BoardInfoFragment = { __typename?: 'Board', _id: string, boardName: string, user: string };
+export type BoardInfoFragment = { __typename?: 'Board', _id: string, boardName: string, user: { __typename?: 'User', _id: string, username: string } };
+
+export type RegulerCardFragment = { __typename?: 'Card', _id: string, title: string, description?: Maybe<string>, status: string, board: string };
 
 export type RegulerUserFragment = { __typename?: 'User', _id: string, username: string };
+
+export type ChangeStatusMutationVariables = Exact<{
+  status: Scalars['String'];
+  cardId: Scalars['String'];
+}>;
+
+
+export type ChangeStatusMutation = { __typename?: 'Mutation', changeStatus: { __typename?: 'Card', _id: string, title: string, description?: Maybe<string>, status: string, board: string } };
 
 export type CreateBoardMutationVariables = Exact<{
   boardName: Scalars['String'];
 }>;
 
 
-export type CreateBoardMutation = { __typename?: 'Mutation', createBoard?: Maybe<{ __typename?: 'BoardCreateResponse', errors?: Maybe<{ __typename?: 'BoardCreateError', message: string }>, board?: Maybe<{ __typename?: 'Board', _id: string, boardName: string, user: string }> }> };
+export type CreateBoardMutation = { __typename?: 'Mutation', createBoard?: Maybe<{ __typename?: 'BoardCreateResponse', errors?: Maybe<{ __typename?: 'BoardCreateError', message: string }>, board?: Maybe<{ __typename?: 'Board', _id: string, boardName: string, user: { __typename?: 'User', _id: string, username: string } }> }> };
+
+export type CreateCardMutationVariables = Exact<{
+  title: Scalars['String'];
+  board: Scalars['String'];
+  status: Scalars['String'];
+}>;
+
+
+export type CreateCardMutation = { __typename?: 'Mutation', createCard: { __typename?: 'Card', _id: string, title: string, description?: Maybe<string>, status: string, board: string } };
+
+export type DeleteCardMutationVariables = Exact<{
+  cardId: Scalars['String'];
+}>;
+
+
+export type DeleteCardMutation = { __typename?: 'Mutation', deleteCard: { __typename?: 'CardDeleteResponse', errors?: Maybe<{ __typename?: 'CardDeleteError', message?: Maybe<string> }>, card?: Maybe<{ __typename?: 'Card', _id: string, title: string, description?: Maybe<string>, status: string, board: string }> } };
+
+export type EditCardMutationVariables = Exact<{
+  cardInput: CardInputType;
+}>;
+
+
+export type EditCardMutation = { __typename?: 'Mutation', editCard: { __typename?: 'CardUpdateResponse', card?: Maybe<{ __typename?: 'Card', _id: string, title: string, description?: Maybe<string>, status: string, board: string }>, errors?: Maybe<{ __typename?: 'CardUpdateError', message?: Maybe<string> }> } };
 
 export type LoginMutationVariables = Exact<{
   usernameOrEmail: Scalars['String'];
@@ -121,7 +226,14 @@ export type RegisterMutation = { __typename?: 'Mutation', register: { __typename
 export type BoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', _id: string, boardName: string, user: string }> };
+export type BoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', _id: string, boardName: string, user: { __typename?: 'User', _id: string, username: string } }> };
+
+export type CardsQueryVariables = Exact<{
+  board: Scalars['String'];
+}>;
+
+
+export type CardsQuery = { __typename?: 'Query', cards: Array<{ __typename?: 'Card', _id: string, title: string, description?: Maybe<string>, status: string, board: string }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -132,7 +244,19 @@ export const BoardInfoFragmentDoc = gql`
     fragment BoardInfo on Board {
   _id
   boardName
-  user
+  user {
+    _id
+    username
+  }
+}
+    `;
+export const RegulerCardFragmentDoc = gql`
+    fragment RegulerCard on Card {
+  _id
+  title
+  description
+  status
+  board
 }
     `;
 export const RegulerUserFragmentDoc = gql`
@@ -141,6 +265,40 @@ export const RegulerUserFragmentDoc = gql`
   username
 }
     `;
+export const ChangeStatusDocument = gql`
+    mutation ChangeStatus($status: String!, $cardId: String!) {
+  changeStatus(status: $status, cardId: $cardId) {
+    ...RegulerCard
+  }
+}
+    ${RegulerCardFragmentDoc}`;
+export type ChangeStatusMutationFn = Apollo.MutationFunction<ChangeStatusMutation, ChangeStatusMutationVariables>;
+
+/**
+ * __useChangeStatusMutation__
+ *
+ * To run a mutation, you first call `useChangeStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeStatusMutation, { data, loading, error }] = useChangeStatusMutation({
+ *   variables: {
+ *      status: // value for 'status'
+ *      cardId: // value for 'cardId'
+ *   },
+ * });
+ */
+export function useChangeStatusMutation(baseOptions?: Apollo.MutationHookOptions<ChangeStatusMutation, ChangeStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeStatusMutation, ChangeStatusMutationVariables>(ChangeStatusDocument, options);
+      }
+export type ChangeStatusMutationHookResult = ReturnType<typeof useChangeStatusMutation>;
+export type ChangeStatusMutationResult = Apollo.MutationResult<ChangeStatusMutation>;
+export type ChangeStatusMutationOptions = Apollo.BaseMutationOptions<ChangeStatusMutation, ChangeStatusMutationVariables>;
 export const CreateBoardDocument = gql`
     mutation CreateBoard($boardName: String!) {
   createBoard(boardName: $boardName) {
@@ -179,6 +337,117 @@ export function useCreateBoardMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateBoardMutationHookResult = ReturnType<typeof useCreateBoardMutation>;
 export type CreateBoardMutationResult = Apollo.MutationResult<CreateBoardMutation>;
 export type CreateBoardMutationOptions = Apollo.BaseMutationOptions<CreateBoardMutation, CreateBoardMutationVariables>;
+export const CreateCardDocument = gql`
+    mutation CreateCard($title: String!, $board: String!, $status: String!) {
+  createCard(title: $title, board: $board, status: $status) {
+    ...RegulerCard
+  }
+}
+    ${RegulerCardFragmentDoc}`;
+export type CreateCardMutationFn = Apollo.MutationFunction<CreateCardMutation, CreateCardMutationVariables>;
+
+/**
+ * __useCreateCardMutation__
+ *
+ * To run a mutation, you first call `useCreateCardMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCardMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCardMutation, { data, loading, error }] = useCreateCardMutation({
+ *   variables: {
+ *      title: // value for 'title'
+ *      board: // value for 'board'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useCreateCardMutation(baseOptions?: Apollo.MutationHookOptions<CreateCardMutation, CreateCardMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCardMutation, CreateCardMutationVariables>(CreateCardDocument, options);
+      }
+export type CreateCardMutationHookResult = ReturnType<typeof useCreateCardMutation>;
+export type CreateCardMutationResult = Apollo.MutationResult<CreateCardMutation>;
+export type CreateCardMutationOptions = Apollo.BaseMutationOptions<CreateCardMutation, CreateCardMutationVariables>;
+export const DeleteCardDocument = gql`
+    mutation DeleteCard($cardId: String!) {
+  deleteCard(cardId: $cardId) {
+    errors {
+      message
+    }
+    card {
+      ...RegulerCard
+    }
+  }
+}
+    ${RegulerCardFragmentDoc}`;
+export type DeleteCardMutationFn = Apollo.MutationFunction<DeleteCardMutation, DeleteCardMutationVariables>;
+
+/**
+ * __useDeleteCardMutation__
+ *
+ * To run a mutation, you first call `useDeleteCardMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteCardMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteCardMutation, { data, loading, error }] = useDeleteCardMutation({
+ *   variables: {
+ *      cardId: // value for 'cardId'
+ *   },
+ * });
+ */
+export function useDeleteCardMutation(baseOptions?: Apollo.MutationHookOptions<DeleteCardMutation, DeleteCardMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteCardMutation, DeleteCardMutationVariables>(DeleteCardDocument, options);
+      }
+export type DeleteCardMutationHookResult = ReturnType<typeof useDeleteCardMutation>;
+export type DeleteCardMutationResult = Apollo.MutationResult<DeleteCardMutation>;
+export type DeleteCardMutationOptions = Apollo.BaseMutationOptions<DeleteCardMutation, DeleteCardMutationVariables>;
+export const EditCardDocument = gql`
+    mutation EditCard($cardInput: CardInputType!) {
+  editCard(cardInput: $cardInput) {
+    card {
+      ...RegulerCard
+    }
+    errors {
+      message
+    }
+  }
+}
+    ${RegulerCardFragmentDoc}`;
+export type EditCardMutationFn = Apollo.MutationFunction<EditCardMutation, EditCardMutationVariables>;
+
+/**
+ * __useEditCardMutation__
+ *
+ * To run a mutation, you first call `useEditCardMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditCardMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editCardMutation, { data, loading, error }] = useEditCardMutation({
+ *   variables: {
+ *      cardInput: // value for 'cardInput'
+ *   },
+ * });
+ */
+export function useEditCardMutation(baseOptions?: Apollo.MutationHookOptions<EditCardMutation, EditCardMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditCardMutation, EditCardMutationVariables>(EditCardDocument, options);
+      }
+export type EditCardMutationHookResult = ReturnType<typeof useEditCardMutation>;
+export type EditCardMutationResult = Apollo.MutationResult<EditCardMutation>;
+export type EditCardMutationOptions = Apollo.BaseMutationOptions<EditCardMutation, EditCardMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($usernameOrEmail: String!, $password: String!) {
   login(usernameOrEmail: $usernameOrEmail, password: $password) {
@@ -323,6 +592,41 @@ export function useBoardsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Boa
 export type BoardsQueryHookResult = ReturnType<typeof useBoardsQuery>;
 export type BoardsLazyQueryHookResult = ReturnType<typeof useBoardsLazyQuery>;
 export type BoardsQueryResult = Apollo.QueryResult<BoardsQuery, BoardsQueryVariables>;
+export const CardsDocument = gql`
+    query Cards($board: String!) {
+  cards(board: $board) {
+    ...RegulerCard
+  }
+}
+    ${RegulerCardFragmentDoc}`;
+
+/**
+ * __useCardsQuery__
+ *
+ * To run a query within a React component, call `useCardsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardsQuery({
+ *   variables: {
+ *      board: // value for 'board'
+ *   },
+ * });
+ */
+export function useCardsQuery(baseOptions: Apollo.QueryHookOptions<CardsQuery, CardsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardsQuery, CardsQueryVariables>(CardsDocument, options);
+      }
+export function useCardsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardsQuery, CardsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardsQuery, CardsQueryVariables>(CardsDocument, options);
+        }
+export type CardsQueryHookResult = ReturnType<typeof useCardsQuery>;
+export type CardsLazyQueryHookResult = ReturnType<typeof useCardsLazyQuery>;
+export type CardsQueryResult = Apollo.QueryResult<CardsQuery, CardsQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {

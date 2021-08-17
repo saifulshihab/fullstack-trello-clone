@@ -1,5 +1,8 @@
 fragment BoardInfo on Board {
   _id
   boardName
-  user
+  user {
+    _id
+    username
+  }
 }

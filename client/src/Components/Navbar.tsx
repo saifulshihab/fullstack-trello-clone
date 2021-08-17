@@ -35,7 +35,7 @@ const Navbar = () => {
           >
             <BsGrid3X3Gap />
           </button>
-          <Link to="/boards">
+          <Link to="/">
             <button
               type="button"
               className="flex w-8 h-8 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20"

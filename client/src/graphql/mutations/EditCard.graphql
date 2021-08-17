@@ -1,0 +1,10 @@
+mutation EditCard($cardInput: CardInputType!) {
+  editCard(cardInput: $cardInput) {
+    card {
+      ...RegulerCard
+    }
+    errors {
+      message
+    }
+  }
+}

@@ -1,30 +1,18 @@
 import { Formik } from 'formik';
-import { useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import InputField from '../Components/InputField';
-import {
-  MeDocument,
-  MeQuery,
-  useLoginMutation,
-  useMeQuery,
-} from '../generated/graphql';
+import { MeDocument, MeQuery, useLoginMutation } from '../generated/graphql';
 import toErrorMap from '../utils/toErrorMap';
+
+interface CustomLocationProps {
+  next?: string;
+}
 
 const Login = () => {
   const history = useHistory();
+
   const [login, { loading }] = useLoginMutation();
-  const { data: meData, error } = useMeQuery();
 
-  useEffect(() => {
-    if (!error && meData?.me) {
-      console.log('push to boards');
-      history.push('/boards');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history, meData?.me, error]);
-
-  console.log(meData);
-  console.log(error);
   return (
     <div className="w-80 mt-5 mx-auto">
       <div className="w-full flex items-center justify-center text-gray-700">
@@ -37,6 +25,7 @@ const Login = () => {
           usernameOrEmail: '',
           password: '',
         }}
+        // eslint-disable-next-line consistent-return
         onSubmit={async (values, { setErrors }) => {
           const response = await login({
             variables: values,
@@ -52,6 +41,13 @@ const Login = () => {
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data?.login.errors));
           } else {
+            const { state } = history.location;
+            if (state) {
+              const { next } = state as CustomLocationProps;
+              if (next && next) {
+                return history.push(next);
+              }
+            }
             history.push('/boards');
           }
         }}

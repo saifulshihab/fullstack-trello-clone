@@ -1,0 +1,7 @@
+fragment RegulerCard on Card {
+  _id
+  title
+  description
+  status
+  board
+}

@@ -1,0 +1,5 @@
+mutation CreateCard($title: String!, $board: String!, $status: String!) {
+  createCard(title: $title, board: $board, status: $status) {
+    ...RegulerCard
+  }
+}

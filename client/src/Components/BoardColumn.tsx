@@ -4,20 +4,32 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { IoCloseOutline } from 'react-icons/all';
 import { HiOutlineTemplate, HiOutlineVideoCamera } from 'react-icons/hi';
 import { MdMoreHoriz } from 'react-icons/md';
-import { cardItemsFromServer, useCardDropContext } from '../Pages/Board';
-import { CardStatusType, DndTypes, itemType } from '../types';
+import {
+  CardsDocument,
+  CardsQuery,
+  RegulerCardFragment,
+  useChangeStatusMutation,
+  useCreateCardMutation,
+} from '../generated/graphql';
+import { useBoard } from '../Pages/Board';
+import { CardStatusType, DndTypes } from '../types';
 import Card from './Card';
+import Loader from './Loader';
 
 interface BoardColumnProps {
   cardStatus: CardStatusType;
-  itemList: itemType[];
+  itemList: RegulerCardFragment[];
 }
 
 const BoardColumn = ({ cardStatus, itemList }: BoardColumnProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [newCard, setNewCard] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
-  const { dropHandler } = useCardDropContext();
+
+  const { boardId } = useBoard();
+
+  const [createCard, { loading: createCardLoading }] = useCreateCardMutation();
+  const [changeStatus] = useChangeStatusMutation();
 
   useEffect(() => {
     if (newCard) {
@@ -33,23 +45,38 @@ const BoardColumn = ({ cardStatus, itemList }: BoardColumnProps) => {
       isOver: !!monitor.isOver(),
     }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    drop: (item: any) => {
-      return dropHandler(item.id, cardStatus);
-    },
+    drop: (item: any) =>
+      changeStatus({
+        variables: { cardId: item.id, status: cardStatus },
+      }),
   });
 
-  const newCardSubmitHandler = () => {
+  const newCardSubmitHandler = async () => {
     if (newCardTitle !== '') {
-      const newItem = {
-        _id: Math.floor(Math.random() * 100).toString(),
-        status: cardStatus,
-        title: newCardTitle,
-      };
-      itemList.push(newItem);
-      cardItemsFromServer.push(newItem);
+      const response = await createCard({
+        variables: { title: newCardTitle, status: cardStatus, board: boardId },
+        update: (cache, { data: upcomingData }) => {
+          if (upcomingData?.createCard !== null) {
+            // read cards list
+            const readData = cache.readQuery<CardsQuery>({
+              query: CardsDocument,
+              variables: { board: boardId },
+            });
 
-      setNewCardTitle('');
-      setNewCard(false);
+            cache.writeQuery({
+              query: CardsDocument,
+              data: {
+                cards: [...(readData?.cards || []), upcomingData?.createCard],
+              },
+              variables: { board: boardId },
+            });
+          }
+        },
+      });
+      if (!response.errors) {
+        setNewCardTitle('');
+        setNewCard(false);
+      }
     }
   };
 
@@ -106,7 +133,7 @@ const BoardColumn = ({ cardStatus, itemList }: BoardColumnProps) => {
                 }`}
                 onClick={newCardSubmitHandler}
               >
-                Add
+                {createCardLoading ? <Loader /> : 'ADD'}
               </button>
               <button
                 type="button"

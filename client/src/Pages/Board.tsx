@@ -1,61 +1,33 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { BiStar } from 'react-icons/bi';
 import { FaTrello } from 'react-icons/fa';
 import { MdKeyboardArrowDown, MdMoreHoriz, MdPublic } from 'react-icons/md';
+import { useParams } from 'react-router-dom';
 import BoardColumn from '../Components/BoardColumn';
-import { itemType } from '../types';
+import { RegulerCardFragment, useCardsQuery } from '../generated/graphql';
 
-export const cardItemsFromServer: itemType[] = [
-  {
-    _id: '1',
-    title: 'React Dnd',
-    description: 'Dnd is very important...',
-    status: 'todo',
-  },
-  {
-    _id: '2',
-    title: 'TypeGraphQL',
-    description: 'So much important',
-    status: 'todo',
-  },
-  {
-    _id: '4',
-    title: 'ORM',
-    description: 'databses oath',
-    status: 'todo',
-  },
-  {
-    _id: '5',
-    title: 'Django',
-    description: 'Description of card items...',
-    status: 'doing',
-  },
-  {
-    _id: '6',
-    title: 'AWS',
-    status: 'done',
-  },
-  {
-    _id: '7',
-    title: 'Chakra UI',
-    status: 'done',
-  },
-];
-
-const CardDropHandlerContext = createContext<{
+const BoardContext = createContext<{
+  boardId: string;
+  cardItems?: RegulerCardFragment[] | [];
   // eslint-disable-next-line no-unused-vars
   dropHandler(id: string, status: string): void;
 } | null>(null);
 
 const Board = () => {
-  const [cardItems, setCardItems] = useState<itemType[] | []>([]);
-  const [todoItems, setTodoItems] = useState<itemType[] | []>([]);
-  const [doingItems, setDoingItems] = useState<itemType[] | []>([]);
-  const [doneItems, setDoneItems] = useState<itemType[] | []>([]);
+  const { boardId } = useParams<{ boardId?: string }>();
+
+  const { data, error } = useCardsQuery({
+    variables: { board: boardId as string },
+  });
+
+  const [cardItems, setCardItems] = useState<RegulerCardFragment[] | []>([]);
+  const [todoItems, setTodoItems] = useState<RegulerCardFragment[] | []>([]);
+  const [doingItems, setDoingItems] = useState<RegulerCardFragment[] | []>([]);
+  const [doneItems, setDoneItems] = useState<RegulerCardFragment[] | []>([]);
 
   useEffect(() => {
-    if (cardItemsFromServer) {
-      setCardItems(cardItemsFromServer);
+    if (!error && data?.cards) {
+      setCardItems(data?.cards);
 
       const todo = cardItems.filter((item) => item.status === 'todo');
       const doing = cardItems.filter((item) => item.status === 'doing');
@@ -66,7 +38,8 @@ const Board = () => {
       setDoingItems(doing);
       setDoneItems(done);
     }
-  }, [cardItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, data?.cards, cardItems]);
 
   // changing card status while drop end
   const dropHandler = (id: string, status: string) => {
@@ -76,9 +49,6 @@ const Board = () => {
       cardItems.filter((item) => item._id !== id).concat(selectedItem)
     );
   };
-
-  console.log('rendering board component...');
-  console.log(cardItems);
 
   return (
     <div
@@ -181,22 +151,24 @@ const Board = () => {
         </div>
         {/* board content */}
         <div className="w-full flex items-start flex-no-wrap overflow-x-auto space-x-3 p-1 text-gray-600">
-          <CardDropHandlerContext.Provider value={{ dropHandler }}>
+          <BoardContext.Provider
+            value={{ boardId: boardId as string, dropHandler }}
+          >
             {/* to do */}
             <BoardColumn cardStatus="todo" itemList={todoItems} />
             {/* doing */}
             <BoardColumn cardStatus="doing" itemList={doingItems} />
             {/* done */}
             <BoardColumn cardStatus="done" itemList={doneItems} />
-          </CardDropHandlerContext.Provider>
+          </BoardContext.Provider>
         </div>
       </div>
     </div>
   );
 };
 
-export const useCardDropContext = () => {
-  const context = useContext(CardDropHandlerContext);
+export const useBoard = () => {
+  const context = useContext(BoardContext);
 
   if (!context) throw Error('No context');
 
