@@ -4,6 +4,8 @@
   "main": "dist/index.js",
   "scripts": {
     "watch": "tsc -w",
+    "tsc": "tsc",
+    "server": "node dist/index.js",
     "dev:server": "nodemon dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

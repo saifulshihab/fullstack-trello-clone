@@ -69,9 +69,11 @@ const main = async () => {
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(4000, 'localhost', () => {
+  const PORT = process.env.PORT || 8080;
+
+  app.listen(PORT as number, 'localhost', () => {
     console.log(
-      `🚀 Server ready at http://localhost:4000${apolloServer.graphqlPath}`
+      `🚀 Server ready at http://localhost:${PORT}${apolloServer.graphqlPath}`
     );
   });
 };

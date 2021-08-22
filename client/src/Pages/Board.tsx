@@ -4,26 +4,26 @@ import { FaTrello } from 'react-icons/fa';
 import { MdKeyboardArrowDown, MdMoreHoriz, MdPublic } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import BoardColumn from '../Components/BoardColumn';
-import { RegulerCardFragment, useCardsQuery } from '../generated/graphql';
+import { CardInputType, useCardsQuery } from '../generated/graphql';
+import useBoardName from '../hooks/useBoardName';
 
 const BoardContext = createContext<{
   boardId: string;
-  cardItems?: RegulerCardFragment[] | [];
-  // eslint-disable-next-line no-unused-vars
-  dropHandler(id: string, status: string): void;
+  cardItems?: CardInputType[] | [];
 } | null>(null);
 
 const Board = () => {
   const { boardId } = useParams<{ boardId?: string }>();
+  const boardName = useBoardName(boardId as string);
 
   const { data, error } = useCardsQuery({
     variables: { board: boardId as string },
   });
 
-  const [cardItems, setCardItems] = useState<RegulerCardFragment[] | []>([]);
-  const [todoItems, setTodoItems] = useState<RegulerCardFragment[] | []>([]);
-  const [doingItems, setDoingItems] = useState<RegulerCardFragment[] | []>([]);
-  const [doneItems, setDoneItems] = useState<RegulerCardFragment[] | []>([]);
+  const [cardItems, setCardItems] = useState<CardInputType[] | []>([]);
+  const [todoItems, setTodoItems] = useState<CardInputType[] | []>([]);
+  const [doingItems, setDoingItems] = useState<CardInputType[] | []>([]);
+  const [doneItems, setDoneItems] = useState<CardInputType[] | []>([]);
 
   useEffect(() => {
     if (!error && data?.cards) {
@@ -40,15 +40,6 @@ const Board = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, data?.cards, cardItems]);
-
-  // changing card status while drop end
-  const dropHandler = (id: string, status: string) => {
-    const selectedItem = cardItems.filter((item) => item._id === id)[0];
-    selectedItem.status = status;
-    setCardItems(
-      cardItems.filter((item) => item._id !== id).concat(selectedItem)
-    );
-  };
 
   return (
     <div
@@ -74,9 +65,11 @@ const Board = () => {
               </button>
               <button
                 type="button"
-                className="flex h-8 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-2"
+                className="flex h-8 w-36 max-w-40 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-2"
               >
-                <span className="ml-2 text-sm">fullstack-trello-clone</span>
+                <span className="ml-2 text-sm truncate">
+                  {boardName !== '' ? boardName : 'Loading...'}
+                </span>
               </button>
               <button
                 type="button"
@@ -88,9 +81,11 @@ const Board = () => {
             <div className="ml-3 flex space-x-3 items-center">
               <button
                 type="button"
-                className="flex h-8 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-2"
+                className="flex h-8 w-36 max-w-40 bg-gray-100 items-center justify-center text-xl rounded-sm bg-opacity-30 hover:bg-opacity-20 px-2"
               >
-                <span className="ml-2 text-sm">fullstack-trello-clone</span>
+                <span className="ml-2 text-sm truncate">
+                  {boardName !== '' ? boardName : 'Loading...'}
+                </span>
               </button>
               <button
                 type="button"
@@ -151,9 +146,7 @@ const Board = () => {
         </div>
         {/* board content */}
         <div className="w-full flex items-start flex-no-wrap overflow-x-auto space-x-3 p-1 text-gray-600">
-          <BoardContext.Provider
-            value={{ boardId: boardId as string, dropHandler }}
-          >
+          <BoardContext.Provider value={{ boardId: boardId as string }}>
             {/* to do */}
             <BoardColumn cardStatus="todo" itemList={todoItems} />
             {/* doing */}
