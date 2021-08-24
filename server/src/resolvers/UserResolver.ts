@@ -1,4 +1,4 @@
-import argon2 from 'argon2';
+import bcrypt from 'bcryptjs';
 import {
   Arg,
   Ctx,
@@ -67,7 +67,7 @@ export default class UserResolver {
       return { errors };
     }
 
-    const hashPassword = await argon2.hash(registerInput.password);
+    const hashPassword = await bcrypt.hash(registerInput.password, 10);
     let user;
 
     try {
@@ -138,7 +138,7 @@ export default class UserResolver {
         ],
       };
     }
-    const valid = await argon2.verify(user?.password, password);
+    const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
       return {
         errors: [

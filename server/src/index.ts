@@ -39,7 +39,10 @@ const main = async () => {
   );
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis({
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: 6379,
+  });
 
   // session
   app.use(
@@ -71,7 +74,7 @@ const main = async () => {
 
   const PORT = process.env.PORT || 8080;
 
-  app.listen(PORT as number, 'localhost', () => {
+  app.listen(PORT as number, () => {
     console.log(
       `🚀 Server ready at http://localhost:${PORT}${apolloServer.graphqlPath}`
     );
