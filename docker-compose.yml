@@ -1,0 +1,51 @@
+version: '3'
+services:
+  web:
+    image: trello-clone-web:1.0
+    stdin_open: true
+    ports:
+      - '3000:3000'
+    networks:
+      - webnet
+
+  server:
+    image: trello-clone-server:1.0
+    ports:
+      - '4000:4000'
+    networks:
+      - webnet
+    environment:
+      PORT: ${PORT}
+      NODE_ENV: ${NODE_ENV}
+      MONGO_URI: ${MONGO_URI}
+    depends_on:
+      - db
+
+  db:
+    image: mongo
+    ports:
+      - '27017:27017'
+    networks:
+      - webnet
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redisdb:/data
+    environment:
+      REDIS_HOST: redis
+    command: ['redis-server', '--bind', 'redis', '--port', '6379']
+    networks:
+      - webnet
+
+networks:
+  webnet:
+
+volumes:
+  mongo-data:
+    driver: local
+  redisdb:
