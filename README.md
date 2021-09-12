@@ -11,6 +11,6 @@ Full Stack Trello board clone using React &amp; GraphQL.
 
 ### Screenshot
 
-<img alt="project screenshot" src="https://mir-cdn.behance.net/v1/rendition/project_modules/1400/7109ed125194285.6113ed6716889.png" />
+<img alt="project screenshot" src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/87d8c2125194285.61212de1e1f88.png" />
 
 Show some ❤️ by ⭐ the project.
